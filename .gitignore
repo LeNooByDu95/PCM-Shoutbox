@@ -1,12 +1,117 @@
-*.class
+function readCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0;i < ca.length;i++) {
+        var c = ca[i];
+        while (c.charAt(0)==' ') c = c.substring(1,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+}
+function createCookie(name,value,days){
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime()+(days*24*60*60*1000));
+        var expires = "; expires="+date.toGMTString();
+    }
+    else var expires = "";
+    document.cookie = name+"="+value+ expires+"; path=/";                
+}
+function eraseCookie(name) {
+    createCookie(name,"",-1);
+}
+function addtexteMute(){
+    var textpubb = readCookie("PseudoMute");
+    var countsplit = 0;   
+    var tableautext = [];
+    var textsplit = "";
+    if (textpubb == null){
+    countsplit = 0;
+    }
+    
+    else {  
+    textsplit = textpubb.split(',');
+    countsplit = textsplit.length;   
+    }
+    for (var i = 0;i<countsplit;i++){
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
+    tableautext[i] = textsplit[i];
+    }
+    var newtext = prompt('Veulliez Entrer la personne a Mute !', '');
+    tableautext[countsplit] = newtext;
+    createCookie("PseudoMute", tableautext, 0); 
+}
+function checkmessageMute(){
+    var textpubb = readCookie("PseudoMute");
+    var tableautext = [];
+    var countsplit = 0;
+    var textsplit = "";
+    if (textpubb == null){
+        countsplit = 0;
+    }
+    
+    else {  
+    textsplit = textpubb.split(',');
+    countsplit = textsplit.length;
+    }  
+    for (var i = 0;i<countsplit;i++){  
+    tableautext[i] = textsplit[i];
+    }
+    var newcount = textsplit.length;
+    for (var a = 0;a<newcount;a++){  
+        var textsearch = textsplit[a];
+    var msg = $('#taigachat_box').children('ol').children('li');
+    for(var b in msg) {
+        var id = msg.eq(b).data('messageid');
+        var msg_aut = $('#taigachat_box').children('ol').children('li').eq(b).children('span').eq(1).children('a').text().trim().toLowerCase();
+         if(msg_aut.indexOf(textsearch.toLowerCase()) != -1){
+                $('#taigachat_box').children('ol').children('li[data-messageid="' + id + '"]').remove();
+            }
+    }
+    }   
 
-# Package Files #
-*.jar
-*.war
-*.ear
+}
+function seeTextePseudoMute(){
+    var textpubb = readCookie("PseudoMute");
+    var tableautext = [];
+    var countsplit = 0;
+    var textsplit = "";
+    if (textpubb == null){
+        countsplit = 0;
+    }   
+    else {  
+    textsplit = textpubb.split(',');
+    countsplit = textsplit.length;
+    }  
+    for (var i = 0;i<countsplit;i++){  
+    tableautext[i] = textsplit[i];
+    }
+alert('Voici les membres que vous avez Mute:\n' + tableautext);
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
+}
+function MuteShoutBoxfunc(){
+
+var infos = prompt("Si tu shouaite mute un membre rentre \"Mute\" !\nSi tu shouaite reset le Script MuteShoutBox rentre \"reset\" !\nSi tu shouaite voir la liste des membres mute entre \"See\" !", '' );
+
+if (infos.toLowerCase() == "mute"){
+    addtexteMute();
+
+}
+else if (infos.toLowerCase() == "reset"){
+if(confirm("Est tu sûr de vouloir Reset MuteShoutBox ?")){
+ eraseCookie('PseudoMute');
+ alert("MuteShoutBox #Reset");
+}
+else {
+alert("MuteShoutBox #Non-Reset");
+}
+
+}
+else if (infos.toLowerCase() == "see"){
+seeTextePseudoMute();
+}
+}
+$(document).ready(function(){
+$('#taigachat_full').find('.nodeTitle').append('<div id="PseudoMuteMarent" onclick="MuteShoutBoxfunc();" style="margin-right: 2px;margin-top: 3px;font-style:none;float:left;cursor:pointer;position: relative;" class="fa fa-microphone-slash">');
+setInterval(function(){checkmessageMute();}, 1000);
+});
